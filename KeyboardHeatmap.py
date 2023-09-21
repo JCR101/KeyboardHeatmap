@@ -20,11 +20,11 @@ canvas = fig.canvas
 
 keys_pressed = {key: 0 for key in [
     'esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12',
-    'tilde', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'minus', 'equal', 'backspace',
+    'tilde', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'backspace',
     'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'lbracket', 'rbracket', 'backslash',
     'capslock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon', 'quote', 'enter',
     'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'comma', 'period', 'slash', 'rshift',
-    'ctrl', 'fn', 'win', 'alt', 'space', 'ralt', 'rctrl',
+    'ctrl', 'fn', 'win', 'alt', 'space', 'ralt', 'rctrl', '-'
 ]}
 
 # Dictionary to fix the visual representation of the keys
@@ -32,7 +32,7 @@ key_visual_representation = {
     'esc': 'Esc', 'f1': 'F1', 'f2': 'F2', 'f3': 'F3', 'f4': 'F4', 'f5': 'F5',
     'f6': 'F6', 'f7': 'F7', 'f8': 'F8', 'f9': 'F9', 'f10': 'F10', 'f11': 'F11', 'f12': 'F12',
     'tilde': '~', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7',
-    '8': '8', '9': '9', '0': '0', 'minus': '-', 'equal': '=', 'backspace': '⬅️',
+    '8': '8', '9': '9', '0': '0', '-': '-', '=': '=', 'backspace': '⬅️',
     'tab': '→|', 'q': 'Q', 'w': 'W', 'e': 'E', 'r': 'R', 't': 'T', 'y': 'Y', 'u': 'U',
     'i': 'I', 'o': 'O', 'p': 'P', 'lbracket': '[', 'rbracket': ']', 'backslash': '\\',
     'capslock': '⬆️ Lock', 'a': 'A', 's': 'S', 'd': 'D', 'f': 'F', 'g': 'G', 'h': 'H',
@@ -63,6 +63,13 @@ def on_press(key):
             key_char = "capslock"
         elif key == keyboard.Key.ctrl_l:
             key_char = "ctrl"
+        elif key == keyboard.Key.alt_l:
+            key_char = "alt"
+        elif key == keyboard.Key.minus:
+            key_char = "-"
+        elif key == keyboard.Key.equal:
+            key_char = "="
+
         else:
             key_char = str(key).split('.')[1]
             # gets the key name for special keys like space, esc, etc.
@@ -70,6 +77,7 @@ def on_press(key):
     # Increases the count of the key pressed
     if key_char in keys_pressed:
         keys_pressed[key_char] += 1
+        print(f"Key pressed: {key_char}, Count: {keys_pressed[key_char]}")
 
 
 def update_heatmap():
@@ -83,7 +91,7 @@ def update_heatmap():
     key_positions = {
         'esc': (0, 6), 'f1': (2, 6), 'f2': (3, 6), 'f3': (4, 6), 'f4': (5, 6), 'f5': (6, 6), 'f6': (7, 6), 'f7': (8, 6), 'f8': (9, 6), 'f9': (10, 6), 'f10': (11, 6), 'f11': (12, 6), 'f12': (13, 6),
         # ... (first row of keys)
-        'tilde': (0, 5), '1': (1, 5), '2': (2, 5), '3': (3, 5), '4': (4, 5), '5': (5, 5), '6': (6, 5), '7': (7, 5), '8': (8, 5), '9': (9, 5), '0': (10, 5), 'minus': (11, 5), 'equal': (12, 5), 'backspace': (13, 5),
+        'tilde': (0, 5), '1': (1, 5), '2': (2, 5), '3': (3, 5), '4': (4, 5), '5': (5, 5), '6': (6, 5), '7': (7, 5), '8': (8, 5), '9': (9, 5), '0': (10, 5), '-': (11, 5), '=': (12, 5), 'backspace': (13, 5),
         # ... (second row of keys)
         'tab': (0, 4), 'q': (1.5, 4), 'w': (2.5, 4), 'e': (3.5, 4), 'r': (4.5, 4), 't': (5.5, 4), 'y': (6.5, 4), 'u': (7.5, 4), 'i': (8.5, 4), 'o': (9.5, 4), 'p': (10.5, 4), 'lbracket': (11.5, 4), 'rbracket': (12.5, 4), 'backslash': (13.5, 4),
         # ... (third row of keys)
@@ -102,14 +110,25 @@ def update_heatmap():
         max_value = 1
 
     for key, position in key_positions.items():
-        plt.text(position[0], position[1], key_visual_representation[key].upper(),
-                 ha='center', va='center',
-                 bbox=dict(boxstyle="square,pad=0.3",
-                           facecolor=colors.rgb2hex(plt.cm.Reds(
-                               keys_pressed[key] / max_value)),
-                           edgecolor="none"
-                           )
-                 )
+        if key in ['-', '=', '[', ']', '\\', ';', '\'', ',', '.', '/']:
+            plt.text(position[0], position[1], key_visual_representation[key],
+                     ha='center', va='center',
+                     bbox=dict(boxstyle="square,pad=0.3",
+                               facecolor=colors.rgb2hex(plt.cm.Reds(
+                                   keys_pressed[key] / max_value)),
+                               edgecolor="none"
+                               )
+                     )
+        else:
+
+            plt.text(position[0], position[1], key_visual_representation[key].upper(),
+                     ha='center', va='center',
+                     bbox=dict(boxstyle="square,pad=0.3",
+                               facecolor=colors.rgb2hex(plt.cm.Reds(
+                                   keys_pressed[key] / max_value)),
+                               edgecolor="none"
+                               )
+                     )
 
     plt.xlim(-1, 15)
     plt.ylim(-1, 7)
@@ -152,6 +171,9 @@ def listen_keys():
 
 # Starting the pynput listener in a separate thread
 thread = threading.Thread(target=listen_keys)
+# set to a daemon to help with garbage collection on exit
+thread.daemon = True
 thread.start()
+
 
 plt.show()
