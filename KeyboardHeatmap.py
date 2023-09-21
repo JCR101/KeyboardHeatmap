@@ -52,8 +52,20 @@ def on_press(key):
         # Checks if the key character is in the dictionary
         key_char = key.char
     except AttributeError:
-        # gets the key name for special keys like space, esc, etc.
-        key_char = str(key).split('.')[1]
+        # Handles special cases
+        if key == keyboard.Key.shift_r:
+            key_char = "rshift"
+        elif key == keyboard.Key.ctrl_r:
+            key_char = "rctrl"
+        elif key == keyboard.Key.alt_gr:
+            key_char = "ralt"
+        elif key == keyboard.Key.caps_lock:
+            key_char = "capslock"
+        elif key == keyboard.Key.ctrl_l:
+            key_char = "ctrl"
+        else:
+            key_char = str(key).split('.')[1]
+            # gets the key name for special keys like space, esc, etc.
 
     # Increases the count of the key pressed
     if key_char in keys_pressed:
@@ -126,7 +138,7 @@ def animate(i):
 
 # Using FuncAnimation to periodically call update_heatmap
 ani = animation.FuncAnimation(
-    fig, animate, interval=100, cache_frame_data=False)
+    fig, animate, interval=1000, cache_frame_data=False)
 
 # Attaching the animation to the figure to prevent it from being garbage collected
 fig.ani = ani
@@ -141,6 +153,5 @@ def listen_keys():
 # Starting the pynput listener in a separate thread
 thread = threading.Thread(target=listen_keys)
 thread.start()
-
 
 plt.show()
