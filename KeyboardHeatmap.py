@@ -95,7 +95,7 @@ def update_heatmap():
         # ... (fourth row of keys)
         'shift': (0, 2), 'z': (2, 2), 'x': (3, 2), 'c': (4, 2), 'v': (5, 2), 'b': (6, 2), 'n': (7, 2), 'm': (8, 2), ',': (9, 2), '.': (10, 2), '/': (11, 2), 'rshift': (12, 2),
         # ... (fifth row of keys)
-        'ctrl': (0, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (13, 1), 'rctrl': (14, 1),
+        'ctrl': (0, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (12, 1), 'rctrl': (13.5, 1),
         # ... (sixth row of keys)
 
     }
