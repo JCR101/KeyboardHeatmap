@@ -24,7 +24,7 @@ keys_pressed = {key: 0 for key in [
     'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
     'capslock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'enter',
     'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'rshift',
-    'ctrl', 'fn', 'win', 'alt', 'space', 'ralt', 'rctrl', '-'
+    'ctrl', 'alt', 'space', 'ralt', 'rctrl', '-'
 ]}
 
 # Dictionary to fix the visual representation of the keys
@@ -39,7 +39,7 @@ key_visual_representation = {
     'j': 'J', 'k': 'K', 'l': 'L', ';': ';', '\'': '\'', 'enter': '⏎',
     'shift': '⇧', 'z': 'Z', 'x': 'X', 'c': 'C', 'v': 'V', 'b': 'B', 'n': 'N', 'm': 'M',
     ',': ',', '.': '.', '/': '/', 'rshift': '⇧',
-    'ctrl': 'Ctrl', 'fn': 'Fn', 'win': 'Win', 'alt': 'Alt', 'space': 'Space',
+    'ctrl': 'Ctrl', 'alt': 'Alt', 'space': 'Space',
     'ralt': 'Alt', 'rctrl': 'Ctrl'
 }
 
@@ -95,7 +95,7 @@ def update_heatmap():
         # ... (fourth row of keys)
         'shift': (0, 2), 'z': (2, 2), 'x': (3, 2), 'c': (4, 2), 'v': (5, 2), 'b': (6, 2), 'n': (7, 2), 'm': (8, 2), ',': (9, 2), '.': (10, 2), '/': (11, 2), 'rshift': (12, 2),
         # ... (fifth row of keys)
-        'ctrl': (0, 1), 'fn': (1, 1), 'win': (2, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (13, 1), 'rctrl': (14, 1),
+        'ctrl': (0, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (13, 1), 'rctrl': (14, 1),
         # ... (sixth row of keys)
 
     }
