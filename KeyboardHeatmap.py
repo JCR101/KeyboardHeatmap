@@ -12,9 +12,11 @@ for key in mpl.rcParams:
         mpl.rcParams[key] = ''
 
 key_queue = queue.Queue()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(10, 6))
+fig.subplots_adjust(bottom=0.15)
 canvas = fig.canvas
 
+text_objects = {}
 
 # Initializes dictionary with keys and default press count of 0
 
@@ -107,24 +109,26 @@ def update_heatmap():
 
     for key, position in key_positions.items():
         if key in ['-', '=', '[', ']', '\\', ';', '\'', ',', '.', '/', '`']:
-            plt.text(position[0], position[1], key_visual_representation[key],
-                     ha='center', va='center',
-                     bbox=dict(boxstyle="square,pad=0.3",
-                               facecolor=colors.rgb2hex(plt.cm.Reds(
-                                   keys_pressed[key] / max_value)),
-                               edgecolor="none"
-                               )
-                     )
+            text_objects[key] = plt.text(position[0], position[1], key_visual_representation[key],
+                                         ha='center', va='center', picker=True,
+                                         bbox=dict(boxstyle="square,pad=0.5",
+                                                   facecolor=colors.rgb2hex(plt.cm.Reds(
+                                                       keys_pressed[key] / max_value)),
+                                                   edgecolor="black"
+                                                   )
+                                         )
         else:
 
-            plt.text(position[0], position[1], key_visual_representation[key].upper(),
-                     ha='center', va='center',
-                     bbox=dict(boxstyle="square,pad=0.3",
-                               facecolor=colors.rgb2hex(plt.cm.Reds(
-                                   keys_pressed[key] / max_value)),
-                               edgecolor="none"
-                               )
-                     )
+            text_objects[key] = plt.text(position[0], position[1], key_visual_representation[key].upper(),
+                                         ha='center', va='center', picker=True,
+                                         bbox=dict(boxstyle="square,pad=0.5",
+                                                   facecolor=colors.rgb2hex(plt.cm.Reds(
+                                                       keys_pressed[key] / max_value)),
+                                                   edgecolor="black"
+                                                   )
+
+
+                                         )
 
     plt.xlim(-1, 15)
     plt.ylim(-1, 7)
@@ -134,6 +138,24 @@ def update_heatmap():
     canvas.flush_events()
 
 
+last_hovered_key = None
+
+
+def on_hover(event):
+    global last_hovered_key
+    for key, text in text_objects.items():
+        if text.contains(event)[0]:
+            if last_hovered_key != key:  # Checks if this is a different key
+                last_hovered_key = key  # Updates the last hovered key
+                print(
+                    f"Hovering over key: {key} - Press count: {keys_pressed[key]}")
+
+            break
+
+
+fig.canvas.mpl_connect('motion_notify_event', on_hover)
+
+
 def on_close(event):
     global running
     running = False
@@ -141,6 +163,7 @@ def on_close(event):
 
 
 fig.canvas.mpl_connect('close_event', on_close)
+
 
 running = True
 
