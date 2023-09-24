@@ -11,12 +11,18 @@ for key in mpl.rcParams:
     if key.startswith('keymap.'):
         mpl.rcParams[key] = ''
 
+
 key_queue = queue.Queue()
 fig, ax = plt.subplots(figsize=(10, 6))
+hover_text_display = ax.text(
+    7, -0.5, 'test_text', ha='center', va='center', color='blue', fontsize=30, zorder=10)
+fig.canvas.draw()
+
 fig.subplots_adjust(bottom=0.15)
 canvas = fig.canvas
 
 text_objects = {}
+last_hovered_key = None
 
 # Initializes dictionary with keys and default press count of 0
 
@@ -82,6 +88,8 @@ def update_heatmap():
     if not plt.fignum_exists(fig.number):  # Checks if the figure still exists
         return
 
+    current_hover_text = hover_text_display.get_text()
+
     # clears the current axes that the heatmap is on
     plt.gca().cla()
 
@@ -137,20 +145,34 @@ def update_heatmap():
     canvas.draw()
     canvas.flush_events()
 
-
-last_hovered_key = None
+    if last_hovered_key:
+        hover_text_display.set_text(
+            f"Hovering over key: {key_visual_representation[last_hovered_key]} - Press count: {keys_pressed[last_hovered_key]}")
+    else:
+        hover_text_display.set_text('')
+    hover_text_display.set_zorder(10)
+    hover_text_display.set_text(current_hover_text)  # Restore the hover text
+    print(current_hover_text)
 
 
 def on_hover(event):
-    global last_hovered_key
+    global last_hovered_key  # Declare it global so you can modify its value
+    found_key = None
     for key, text in text_objects.items():
         if text.contains(event)[0]:
-            if last_hovered_key != key:  # Checks if this is a different key
-                last_hovered_key = key  # Updates the last hovered key
-                print(
-                    f"Hovering over key: {key} - Press count: {keys_pressed[key]}")
-
+            found_key = key
             break
+
+    if last_hovered_key != found_key:  # Check if this is a different key
+        last_hovered_key = found_key  # Update the last hovered key
+        if found_key:
+            hover_text_display.set_text(
+                f"Hovering over key: {key_visual_representation[key]} - Press count: {keys_pressed[key]}")
+            canvas.draw_idle()
+        else:
+            # Clear text if not hovering over a key
+            hover_text_display.set_text('')
+            canvas.draw_idle()
 
 
 fig.canvas.mpl_connect('motion_notify_event', on_hover)
