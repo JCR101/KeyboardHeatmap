@@ -11,10 +11,18 @@ for key in mpl.rcParams:
     if key.startswith('keymap.'):
         mpl.rcParams[key] = ''
 
+
 key_queue = queue.Queue()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(10, 6))
+hover_text_display = ax.text(
+    7, -0.5, 'test_text', ha='center', va='center', color='blue', fontsize=30, zorder=10)
+fig.canvas.draw()
+
+fig.subplots_adjust(bottom=0.15)
 canvas = fig.canvas
 
+text_objects = {}
+last_hovered_key = None
 
 # Initializes dictionary with keys and default press count of 0
 
@@ -80,6 +88,8 @@ def update_heatmap():
     if not plt.fignum_exists(fig.number):  # Checks if the figure still exists
         return
 
+    current_hover_text = hover_text_display.get_text()
+
     # clears the current axes that the heatmap is on
     plt.gca().cla()
 
@@ -95,7 +105,7 @@ def update_heatmap():
         # ... (fourth row of keys)
         'shift': (0, 2), 'z': (2, 2), 'x': (3, 2), 'c': (4, 2), 'v': (5, 2), 'b': (6, 2), 'n': (7, 2), 'm': (8, 2), ',': (9, 2), '.': (10, 2), '/': (11, 2), 'rshift': (12, 2),
         # ... (fifth row of keys)
-        'ctrl': (0, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (13, 1), 'rctrl': (14, 1),
+        'ctrl': (0, 1), 'alt': (3, 1), 'space': (8, 1), 'ralt': (12, 1), 'rctrl': (13.5, 1),
         # ... (sixth row of keys)
 
     }
@@ -107,24 +117,26 @@ def update_heatmap():
 
     for key, position in key_positions.items():
         if key in ['-', '=', '[', ']', '\\', ';', '\'', ',', '.', '/', '`']:
-            plt.text(position[0], position[1], key_visual_representation[key],
-                     ha='center', va='center',
-                     bbox=dict(boxstyle="square,pad=0.3",
-                               facecolor=colors.rgb2hex(plt.cm.Reds(
-                                   keys_pressed[key] / max_value)),
-                               edgecolor="none"
-                               )
-                     )
+            text_objects[key] = plt.text(position[0], position[1], key_visual_representation[key],
+                                         ha='center', va='center', picker=True,
+                                         bbox=dict(boxstyle="square,pad=0.5",
+                                                   facecolor=colors.rgb2hex(plt.cm.Reds(
+                                                       keys_pressed[key] / max_value)),
+                                                   edgecolor="black"
+                                                   )
+                                         )
         else:
 
-            plt.text(position[0], position[1], key_visual_representation[key].upper(),
-                     ha='center', va='center',
-                     bbox=dict(boxstyle="square,pad=0.3",
-                               facecolor=colors.rgb2hex(plt.cm.Reds(
-                                   keys_pressed[key] / max_value)),
-                               edgecolor="none"
-                               )
-                     )
+            text_objects[key] = plt.text(position[0], position[1], key_visual_representation[key].upper(),
+                                         ha='center', va='center', picker=True,
+                                         bbox=dict(boxstyle="square,pad=0.5",
+                                                   facecolor=colors.rgb2hex(plt.cm.Reds(
+                                                       keys_pressed[key] / max_value)),
+                                                   edgecolor="black"
+                                                   )
+
+
+                                         )
 
     plt.xlim(-1, 15)
     plt.ylim(-1, 7)
@@ -132,6 +144,38 @@ def update_heatmap():
     plt.draw()
     canvas.draw()
     canvas.flush_events()
+
+    if last_hovered_key:
+        hover_text_display.set_text(
+            f"Hovering over key: {key_visual_representation[last_hovered_key]} - Press count: {keys_pressed[last_hovered_key]}")
+    else:
+        hover_text_display.set_text('')
+    hover_text_display.set_zorder(10)
+    hover_text_display.set_text(current_hover_text)  # Restore the hover text
+    print(current_hover_text)
+
+
+def on_hover(event):
+    global last_hovered_key  # Declare it global so you can modify its value
+    found_key = None
+    for key, text in text_objects.items():
+        if text.contains(event)[0]:
+            found_key = key
+            break
+
+    if last_hovered_key != found_key:  # Check if this is a different key
+        last_hovered_key = found_key  # Update the last hovered key
+        if found_key:
+            hover_text_display.set_text(
+                f"Hovering over key: {key_visual_representation[key]} - Press count: {keys_pressed[key]}")
+            canvas.draw_idle()
+        else:
+            # Clear text if not hovering over a key
+            hover_text_display.set_text('')
+            canvas.draw_idle()
+
+
+fig.canvas.mpl_connect('motion_notify_event', on_hover)
 
 
 def on_close(event):
@@ -141,6 +185,7 @@ def on_close(event):
 
 
 fig.canvas.mpl_connect('close_event', on_close)
+
 
 running = True
 
