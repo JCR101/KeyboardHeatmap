@@ -152,6 +152,7 @@ def update_heatmap():
         hover_text_display.set_text('')
     hover_text_display.set_zorder(10)
     hover_text_display.set_text(current_hover_text)  # Restore the hover text
+
     print(current_hover_text)
 
 
